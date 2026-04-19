@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>求职追踪工具 PRD（产品需求文档）</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 900px; margin: 0 auto; padding: 40px 20px; line-height: 1.6; color: #333; }
+        h1 { border-bottom: 2px solid #333; padding-bottom: 10px; }
+        h2 { border-bottom: 1px solid #ddd; padding-bottom: 8px; margin-top: 40px; }
+        h3 { margin-top: 30px; }
+        table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #f5f5f5; }
+        code { background: #f5f5f5; padding: 2px 6px; border-radius: 3px; }
+        pre { background: #f5f5f5; padding: 16px; overflow-x: auto; border-radius: 4px; }
+        .meta-table td { border: none; padding: 5px 20px 5px 0; }
+        .meta-table td:first-child { font-weight: bold; }
+        .priority-p0 { color: #f56c6c; font-weight: bold; }
+        .priority-p1 { color: #e6a23c; }
+        .priority-p2 { color: #909399; }
+    </style>
+</head>
+<body>
+
+<h1>求职追踪工具 PRD（产品需求文档）</h1>
+
+<h2>一、文档信息</h2>
+<table class="meta-table">
+    <tr><td>产品名称</td><td>JobTracker 求职追踪工具</td></tr>
+    <tr><td>版本</td><td>V1.0</td></tr>
+    <tr><td>日期</td><td>2026-04-19</td></tr>
+    <tr><td>状态</td><td>规划中</td></tr>
+</table>
+
+<h2>二、产品概述</h2>
+
+<h3>2.1 产品背景</h3>
+<p>产品实习生和应届毕业生在求职过程中面临以下痛点：</p>
+<ul>
+    <li><strong>投递混乱</strong>：投递岗位数量多，难以追踪每个岗位的投递状态</li>
+    <li><strong>信息分散</strong>：岗位信息、简历版本、面试安排分散在不同平台，管理困难</li>
+    <li><strong>复盘缺失</strong>：面试经验无法系统沉淀，重复踩坑</li>
+    <li><strong>进度不透明</strong>：缺乏直观的数据统计，无法把握求职全局</li>
+</ul>
+
+<h3>2.2 产品定位</h3>
+<p>面向产品实习生、应届毕业生的<strong>一站式求职管理工具</strong>，帮助用户高效追踪投递进度、管理简历版本、记录面试复盘，让求职过程有条不紊。</p>
+
+<h3>2.3 目标用户</h3>
+<table>
+    <tr><th>用户画像</th><th>特征描述</th></tr>
+    <tr><td>产品实习生</td><td>寻找暑期/日常实习，投递量大，时间紧迫</td></tr>
+    <tr><td>应届毕业生</td><td>秋招/春招求职，岗位类型多，需要精细化管理</td></tr>
+    <tr><td>转行求职者</td><td>跨行业求职，需要管理不同方向的简历版本</td></tr>
+</table>
+
+<h3>2.4 核心价值</h3>
+<ul>
+    <li><strong>效率提升</strong>：截图智能识别，快速录入岗位信息</li>
+    <li><strong>状态可视</strong>：看板视图 + 数据统计，投递进度一目了然</li>
+    <li><strong>知识沉淀</strong>：面试复盘记录，经验可复用</li>
+    <li><strong>隐私安全</strong>：数据本地存储，无需担心信息泄露</li>
+</ul>
+
+<h2>三、功能需求</h2>
+
+<h3>3.1 功能架构</h3>
+<pre>
+求职追踪工具
+├── 岗位管理模块
+│   ├── 岗位列表/看板视图
+│   ├── 岗位添加/编辑
+│   ├── 状态流转
+│   └── 筛选搜索
+├── 截图识别模块
+│   ├── 图片上传
+│   ├── AI智能解析
+│   └── 自动填充
+├── 简历管理模块
+│   ├── 简历上传
+│   ├── 版本管理
+│   └── 关联岗位
+├── 面试管理模块
+│   ├── 面试时间线
+│   ├── 面试提醒
+│   └── 复盘文档
+├── 数据统计模块
+│   ├── 投递概览
+│   ├── 状态分布
+│   └── 趋势分析
+└── 设置模块
+    ├── API配置
+    ├── 主题设置
+    └── 数据备份
+</pre>
+
+<h3>3.2 岗位管理模块</h3>
+
+<h4>3.2.1 功能描述</h4>
+<p>用户可以记录和管理所有投递的岗位信息，支持列表和看板两种视图模式。</p>
+
+<h4>3.2.2 功能点明细</h4>
+<table>
+    <tr><th>功能点</th><th>描述</th><th>优先级</th></tr>
+    <tr><td>岗位列表</td><td>以列表形式展示所有岗位，支持排序</td><td class="priority-p0">P0</td></tr>
+    <tr><td>看板视图</td><td>以看板形式按状态分组展示，支持拖拽</td><td class="priority-p0">P0</td></tr>
+    <tr><td>岗位添加</td><td>手动填写岗位信息，添加新岗位</td><td class="priority-p0">P0</td></tr>
+    <tr><td>岗位编辑</td><td>修改已有岗位的信息</td><td class="priority-p0">P0</td></tr>
+    <tr><td>岗位删除</td><td>删除岗位记录</td><td class="priority-p0">P0</td></tr>
+    <tr><td>状态变更</td><td>更新岗位投递状态，记录变更历史</td><td class="priority-p0">P0</td></tr>
+    <tr><td>筛选功能</td><td>按状态、公司、日期范围筛选</td><td class="priority-p1">P1</td></tr>
+    <tr><td>搜索功能</td><td>按公司名、职位名关键词搜索</td><td class="priority-p1">P1</td></tr>
+    <tr><td>标签管理</td><td>为岗位添加自定义标签</td><td class="priority-p2">P2</td></tr>
+</table>
+
+<h4>3.2.3 岗位信息字段</h4>
+<table>
+    <tr><th>字段名</th><th>类型</th><th>必填</th><th>说明</th></tr>
+    <tr><td>公司</td><td>文本</td><td>是</td><td>公司名称</td></tr>
+    <tr><td>职位</td><td>文本</td><td>是</td><td>职位名称</td></tr>
+    <tr><td>工作类型</td><td>枚举</td><td>是</td><td>全职/实习/兼职/合同工</td></tr>
+    <tr><td>工作模式</td><td>枚举</td><td>是</td><td>现场/远程/混合</td></tr>
+    <tr><td>工作地点</td><td>文本</td><td>否</td><td>城市或具体地址</td></tr>
+    <tr><td>薪资范围</td><td>数字</td><td>否</td><td>最低薪资-最高薪资（K）</td></tr>
+    <tr><td>年薪月数</td><td>数字</td><td>否</td><td>如12薪、14薪</td></tr>
+    <tr><td>职位描述</td><td>文本</td><td>否</td><td>JD详情</td></tr>
+    <tr><td>任职要求</td><td>文本数组</td><td>否</td><td>从JD提取的要求列表</td></tr>
+    <tr><td>福利待遇</td><td>文本数组</td><td>否</td><td>福利列表</td></tr>
+    <tr><td>来源渠道</td><td>文本</td><td>否</td><td>BOSS/拉勾/官网等</td></tr>
+    <tr><td>来源链接</td><td>URL</td><td>否</td><td>岗位原始链接</td></tr>
+    <tr><td>投递状态</td><td>枚举</td><td>是</td><td>待投递/已投递/筛选中/面试中/Offer/已淘汰/已撤回</td></tr>
+    <tr><td>优先级</td><td>数字</td><td>是</td><td>1-5，数字越大优先级越高</td></tr>
+    <tr><td>关联简历</td><td>关联</td><td>否</td><td>本次投递使用的简历版本</td></tr>
+    <tr><td>标签</td><td>文本数组</td><td>否</td><td>自定义标签</td></tr>
+    <tr><td>备注</td><td>文本</td><td>否</td><td>用户自定义备注</td></tr>
+</table>
+
+<h4>3.2.4 状态流转规则</h4>
+<pre>
+待投递 → 已投递 → 筛选中 → 面试中 → Offer
+    ↓         ↓         ↓         ↓
+已撤回    已淘汰    已淘汰    已淘汰
+</pre>
+
+<h3>3.3 截图智能识别模块</h3>
+
+<h4>3.3.1 功能描述</h4>
+<p>用户上传招聘信息截图，系统通过AI自动识别并提取岗位信息，减少手动录入工作量。</p>
+
+<h4>3.3.2 功能点明细</h4>
+<table>
+    <tr><th>功能点</th><th>描述</th><th>优先级</th></tr>
+    <tr><td>图片上传</td><td>支持拖拽上传或点击上传，支持PNG/JPG格式</td><td class="priority-p0">P0</td></tr>
+    <tr><td>图片预览</td><td>上传后显示图片预览</td><td class="priority-p0">P0</td></tr>
+    <tr><td>AI识别</td><td>调用多模态API解析图片中的岗位信息</td><td class="priority-p0">P0</td></tr>
+    <tr><td>结果填充</td><td>将识别结果自动填充到表单对应字段</td><td class="priority-p0">P0</td></tr>
+    <tr><td>手动修正</td><td>用户可手动修改识别结果</td><td class="priority-p0">P0</td></tr>
+    <tr><td>图片压缩</td><td>自动压缩大图，减少API调用成本</td><td class="priority-p1">P1</td></tr>
+</table>
+
+<h4>3.3.3 识别字段映射</h4>
+<table>
+    <tr><th>图片信息</th><th>系统字段</th></tr>
+    <tr><td>公司名称</td><td>公司</td></tr>
+    <tr><td>职位名称</td><td>职位</td></tr>
+    <tr><td>工作地点</td><td>工作地点</td></tr>
+    <tr><td>薪资范围</td><td>薪资范围</td></tr>
+    <tr><td>职位描述</td><td>职位描述</td></tr>
+    <tr><td>任职要求</td><td>任职要求</td></tr>
+    <tr><td>福利待遇</td><td>福利待遇</td></tr>
+</table>
+
+<h4>3.3.4 AI服务方案</h4>
+<p><strong>主方案：通义千问 qwen-vl-plus</strong></p>
+<ul>
+    <li>价格：约 0.008元/千tokens</li>
+    <li>新用户有免费额度</li>
+    <li>国内访问稳定</li>
+</ul>
+<p><strong>备选方案：</strong>豆包、智谱AI GLM-4V</p>
+
+<h3>3.4 简历管理模块</h3>
+
+<h4>3.4.1 功能描述</h4>
+<p>用户可以管理多个简历版本，根据不同投递需求选择合适的简历。</p>
+
+<h4>3.4.2 功能点明细</h4>
+<table>
+    <tr><th>功能点</th><th>描述</th><th>优先级</th></tr>
+    <tr><td>简历上传</td><td>上传PDF/Word格式简历文件</td><td class="priority-p0">P0</td></tr>
+    <tr><td>简历列表</td><td>展示所有简历版本</td><td class="priority-p0">P0</td></tr>
+    <tr><td>简历命名</td><td>为简历版本命名，如"产品经理-通用版"</td><td class="priority-p0">P0</td></tr>
+    <tr><td>默认简历</td><td>设置默认简历版本</td><td class="priority-p1">P1</td></tr>
+    <tr><td>简历下载</td><td>下载已上传的简历文件</td><td class="priority-p0">P0</td></tr>
+    <tr><td>简历删除</td><td>删除简历版本</td><td class="priority-p0">P0</td></tr>
+    <tr><td>使用统计</td><td>记录每个简历版本的使用次数</td><td class="priority-p2">P2</td></tr>
+    <tr><td>外部链接</td><td>支持添加在线简历链接</td><td class="priority-p2">P2</td></tr>
+</table>
+
+<h4>3.4.3 简历信息字段</h4>
+<table>
+    <tr><th>字段名</th><th>类型</th><th>必填</th><th>说明</th></tr>
+    <tr><td>版本名称</td><td>文本</td><td>是</td><td>如"产品经理-B端版"</td></tr>
+    <tr><td>版本说明</td><td>文本</td><td>否</td><td>描述此版本的特点</td></tr>
+    <tr><td>类型</td><td>枚举</td><td>是</td><td>文件上传/外部链接</td></tr>
+    <tr><td>文件</td><td>文件</td><td>否</td><td>上传的简历文件（PDF/Word）</td></tr>
+    <tr><td>链接</td><td>URL</td><td>否</td><td>外部简历链接</td></tr>
+    <tr><td>适用职位</td><td>文本数组</td><td>否</td><td>此版本适合投递的职位类型</td></tr>
+    <tr><td>标签</td><td>文本数组</td><td>否</td><td>自定义标签</td></tr>
+    <tr><td>是否默认</td><td>布尔</td><td>是</td><td>是否为默认简历版本</td></tr>
+</table>
+
+<h3>3.5 面试管理模块</h3>
+
+<h4>3.5.1 功能描述</h4>
+<p>用户可以记录面试安排，并进行面试复盘，沉淀面试经验。</p>
+
+<h4>3.5.2 功能点明细</h4>
+<table>
+    <tr><th>功能点</th><th>描述</th><th>优先级</th></tr>
+    <tr><td>面试添加</td><td>为某岗位添加面试安排</td><td class="priority-p0">P0</td></tr>
+    <tr><td>面试列表</td><td>列表展示所有面试记录</td><td class="priority-p0">P0</td></tr>
+    <tr><td>时间线视图</td><td>以时间线形式展示面试安排</td><td class="priority-p0">P0</td></tr>
+    <tr><td>面试编辑</td><td>修改面试信息</td><td class="priority-p0">P0</td></tr>
+    <tr><td>面试删除</td><td>删除面试记录</td><td class="priority-p0">P0</td></tr>
+    <tr><td>面试提醒</td><td>浏览器通知提醒即将到来的面试</td><td class="priority-p1">P1</td></tr>
+    <tr><td>复盘编辑</td><td>记录面试问题和自我评价</td><td class="priority-p0">P0</td></tr>
+    <tr><td>问题库</td><td>记录面试问题，可复用</td><td class="priority-p2">P2</td></tr>
+</table>
+
+<h4>3.5.3 面试信息字段</h4>
+<table>
+    <tr><th>字段名</th><th>类型</th><th>必填</th><th>说明</th></tr>
+    <tr><td>关联岗位</td><td>关联</td><td>是</td><td>本次面试对应的岗位</td></tr>
+    <tr><td>面试轮次</td><td>枚举</td><td>是</td><td>HR初筛/技术面/主管面/总监面/HR终面/群面/案例面/其他</td></tr>
+    <tr><td>第几轮</td><td>数字</td><td>是</td><td>标注是第几轮面试</td></tr>
+    <tr><td>面试状态</td><td>枚举</td><td>是</td><td>已安排/已完成/已取消/已改期</td></tr>
+    <tr><td>预约时间</td><td>日期时间</td><td>是</td><td>面试时间</td></tr>
+    <tr><td>时长</td><td>数字</td><td>是</td><td>预计时长（分钟）</td></tr>
+    <tr><td>面试地点</td><td>文本</td><td>否</td><td>线下面试地址</td></tr>
+    <tr><td>线上链接</td><td>URL</td><td>否</td><td>线上面试会议链接</td></tr>
+    <tr><td>面试官</td><td>文本</td><td>否</td><td>面试官姓名/职位</td></tr>
+    <tr><td>备注</td><td>文本</td><td>否</td><td>面试前准备/注意事项</td></tr>
+</table>
+
+<h4>3.5.4 复盘信息字段</h4>
+<table>
+    <tr><th>字段名</th><th>类型</th><th>说明</th></tr>
+    <tr><td>面试问题</td><td>数组</td><td>记录被问到的问题</td></tr>
+    <tr><td>自我评分</td><td>数字</td><td>1-5分，评价自己的表现</td></tr>
+    <tr><td>表现亮点</td><td>文本数组</td><td>本次面试表现好的地方</td></tr>
+    <tr><td>待改进</td><td>文本数组</td><td>需要改进的地方</td></tr>
+    <tr><td>后续行动</td><td>文本</td><td>接下来需要做的事情</td></tr>
+    <tr><td>其他笔记</td><td>文本</td><td>自由记录</td></tr>
+</table>
+
+<h3>3.6 数据统计模块</h3>
+
+<h4>3.6.1 功能描述</h4>
+<p>以可视化图表展示求职进度和数据分析，帮助用户把握求职全局。</p>
+
+<h4>3.6.2 功能点明细</h4>
+<table>
+    <tr><th>功能点</th><th>描述</th><th>优先级</th></tr>
+    <tr><td>统计卡片</td><td>展示关键指标：总投递/面试中/Offer/转化率</td><td class="priority-p0">P0</td></tr>
+    <tr><td>状态分布图</td><td>饼图展示各状态岗位数量分布</td><td class="priority-p0">P0</td></tr>
+    <tr><td>投递趋势图</td><td>折线图展示近30天投递量趋势</td><td class="priority-p1">P1</td></tr>
+    <tr><td>最近动态</td><td>列表展示最近的投递和面试动态</td><td class="priority-p1">P1</td></tr>
+</table>
+
+<h4>3.6.3 统计指标定义</h4>
+<table>
+    <tr><th>指标名</th><th>计算公式</th><th>说明</th></tr>
+    <tr><td>总投递</td><td>COUNT(所有岗位)</td><td>累计投递岗位数</td></tr>
+    <tr><td>面试中</td><td>COUNT(状态=面试中)</td><td>正在面试流程中的岗位数</td></tr>
+    <tr><td>已获Offer</td><td>COUNT(状态=Offer)</td><td>已收到Offer的岗位数</td></tr>
+    <tr><td>投递转化率</td><td>已获Offer / 总投递 × 100%</td><td>从投递到Offer的转化比例</td></tr>
+</table>
+
+<h3>3.7 设置模块</h3>
+
+<h4>3.7.1 功能描述</h4>
+<p>用户可以配置系统设置，包括API密钥、主题、数据备份等。</p>
+
+<h4>3.7.2 功能点明细</h4>
+<table>
+    <tr><th>功能点</th><th>描述</th><th>优先级</th></tr>
+    <tr><td>API配置</td><td>配置AI服务的API密钥</td><td class="priority-p0">P0</td></tr>
+    <tr><td>API提供商选择</td><td>选择使用的AI服务商（通义千问/豆包/智谱）</td><td class="priority-p1">P1</td></tr>
+    <tr><td>主题切换</td><td>浅色/深色/跟随系统</td><td class="priority-p2">P2</td></tr>
+    <tr><td>默认视图设置</td><td>设置默认显示列表或看板视图</td><td class="priority-p2">P2</td></tr>
+    <tr><td>数据导出</td><td>导出所有数据为JSON文件</td><td class="priority-p0">P0</td></tr>
+    <tr><td>数据导入</td><td>从JSON文件恢复数据</td><td class="priority-p0">P0</td></tr>
+</table>
+
+<h2>四、非功能需求</h2>
+
+<h3>4.1 性能需求</h3>
+<table>
+    <tr><th>指标</th><th>要求</th></tr>
+    <tr><td>页面加载时间</td><td>首屏加载 < 3秒</td></tr>
+    <tr><td>数据查询响应</td><td>< 500ms</td></tr>
+    <tr><td>支持数据量</td><td>支持 1000+ 岗位记录</td></tr>
+</table>
+
+<h3>4.2 兼容性需求</h3>
+<table>
+    <tr><th>类型</th><th>要求</th></tr>
+    <tr><td>浏览器</td><td>Chrome 90+、Edge 90+、Firefox 88+、Safari 14+</td></tr>
+    <tr><td>分辨率</td><td>最小支持 1280×720</td></tr>
+    <tr><td>移动端</td><td>响应式布局，支持移动端访问</td></tr>
+</table>
+
+<h3>4.3 安全需求</h3>
+<table>
+    <tr><th>需求</th><th>说明</th></tr>
+    <tr><td>数据存储</td><td>所有数据存储在用户本地，不上传服务器</td></tr>
+    <tr><td>API密钥</td><td>API密钥仅存储在本地，不传输到第三方</td></tr>
+    <tr><td>数据备份</td><td>支持本地文件备份，用户可自行保管</td></tr>
+</table>
+
+<h2>五、交互设计</h2>
+
+<h3>5.1 页面流程</h3>
+<pre>
+首页（数据看板）
+    │
+    ├── 岗位管理
+    │   ├── 列表视图
+    │   ├── 看板视图
+    │   └── 岗位详情
+    │       └── 添加面试
+    │
+    ├── 简历管理
+    │   ├── 简历列表
+    │   └── 简历上传
+    │
+    ├── 面试管理
+    │   ├── 面试列表
+    │   ├── 时间线视图
+    │   └── 复盘编辑
+    │
+    └── 设置
+        ├── API配置
+        └── 数据备份
+</pre>
+
+<h3>5.2 核心操作流程</h3>
+
+<h4>岗位添加流程</h4>
+<pre>
+1. 点击"添加岗位"按钮
+2. 弹出岗位表单对话框
+3. 用户选择：
+   a. 手动填写表单
+   b. 上传截图 → AI识别 → 自动填充表单
+4. 填写/修改完成后点击保存
+5. 新岗位添加成功，跳转到岗位列表
+</pre>
+
+<h4>截图识别流程</h4>
+<pre>
+1. 用户拖拽或点击上传截图
+2. 系统显示图片预览
+3. 用户点击"智能识别"按钮
+4. 系统调用AI API进行解析
+5. 解析成功，自动填充表单字段
+6. 用户可手动修改识别结果
+7. 点击保存完成添加
+</pre>
+
+<h2>六、版本规划</h2>
+
+<h3>V1.0（MVP版本）</h3>
+<p><strong>目标</strong>：实现核心功能，满足基本使用需求</p>
+<p><strong>包含功能</strong>：</p>
+<ul>
+    <li>岗位管理（列表/看板视图）</li>
+    <li>截图智能识别</li>
+    <li>简历管理</li>
+    <li>面试管理（基础）</li>
+    <li>数据统计面板</li>
+    <li>数据导出导入</li>
+</ul>
+
+<h3>V1.1（迭代版本）</h3>
+<p><strong>目标</strong>：优化用户体验，增加高级功能</p>
+<p><strong>计划功能</strong>：</p>
+<ul>
+    <li>面试提醒通知</li>
+    <li>面试问题库</li>
+    <li>数据可视化增强</li>
+    <li>主题切换</li>
+</ul>
+
+<h3>V2.0（扩展版本）</h3>
+<p><strong>目标</strong>：支持多端同步，社交功能</p>
+<p><strong>计划功能</strong>：</p>
+<ul>
+    <li>云端数据同步</li>
+    <li>面经分享社区</li>
+    <li>职位推荐</li>
+    <li>团队协作</li>
+</ul>
+
+<h2>七、风险与应对</h2>
+<table>
+    <tr><th>风险</th><th>影响</th><th>应对措施</th></tr>
+    <tr><td>AI识别准确度不足</td><td>用户需要大量手动修改</td><td>提供手动填写备选，持续优化Prompt</td></tr>
+    <tr><td>浏览器存储空间不足</td><td>无法存储大量数据</td><td>提示用户定期清理，支持导出备份</td></tr>
+    <tr><td>API服务不稳定</td><td>截图识别功能不可用</td><td>支持多API切换，提供手动填写</td></tr>
+    <tr><td>用户忘记备份</td><td>数据丢失风险</td><td>定期提醒备份，开发自动备份功能</td></tr>
+</table>
+
+<h2>八、成功指标</h2>
+<table>
+    <tr><th>指标</th><th>目标值</th></tr>
+    <tr><td>用户留存率（7日）</td><td>> 40%</td></tr>
+    <tr><td>人均添加岗位数</td><td>> 20个</td></tr>
+    <tr><td>截图识别使用率</td><td>> 60%</td></tr>
+    <tr><td>面试复盘完成率</td><td>> 50%</td></tr>
+</table>
+
+</body>
+</html>
