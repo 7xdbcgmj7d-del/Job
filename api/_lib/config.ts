@@ -1,3 +1,5 @@
+/// <reference types="node" />
+
 type RequiredEnvKey =
   | 'DATABASE_URL'
   | 'JWT_SECRET'
