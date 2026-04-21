@@ -1,4 +1,5 @@
 export * from './FilterPill'
 export * from './JobCard'
+export * from './KanbanBoard'
 export * from './JobsSidebar'
 export * from './UserInfo'

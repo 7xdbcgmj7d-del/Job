@@ -1,2 +1,3 @@
-/** 简历管理：上传、版本管理、关联岗位（PRD 3.1） */
-export {}
+export * from './components'
+export * from './hooks/useResumeVersions'
+export * from './types'

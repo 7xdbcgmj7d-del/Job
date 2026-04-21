@@ -12,8 +12,8 @@ export function ChartWidget() {
   const maxValue = Math.max(...chartData.map((d) => d.value))
 
   return (
-    <div className="rounded-[20px] bg-white p-5">
-      <h4 className="mb-4 text-sm font-semibold text-[#1a1a1a]">本周活动</h4>
+    <div className="rounded-[20px] bg-white p-5 dark:bg-[#1f1f1f]">
+      <h4 className="mb-4 text-sm font-semibold text-[#1a1a1a] dark:text-[#f5f5f5]">本周活动</h4>
       <div className="flex h-32 items-end justify-between gap-2">
         {chartData.map((item) => (
           <div key={item.day} className="flex flex-1 flex-col items-center gap-2">
@@ -27,7 +27,7 @@ export function ChartWidget() {
                 }}
               />
             </div>
-            <span className="text-xs text-[#666666]">{item.day}</span>
+            <span className="text-xs text-[#666666] dark:text-[#b8b8b8]">{item.day}</span>
           </div>
         ))}
       </div>

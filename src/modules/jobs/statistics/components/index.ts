@@ -1,2 +1,6 @@
-export * from './StatsWidget'
+export * from './ApplicationTrendChart'
 export * from './ChartWidget'
+export * from './RecentActivityFeed'
+export * from './StatusDistributionPie'
+export * from './StatisticsPanel'
+export * from './StatsWidget'
