@@ -1,9 +1,9 @@
-'use client'
+﻿'use client'
 
 import {
-  Group,
-  Panel,
-  Separator,
+ Group,
+ Panel,
+ Separator,
 } from 'react-resizable-panels'
 
 export const ResizablePanelGroup = Group

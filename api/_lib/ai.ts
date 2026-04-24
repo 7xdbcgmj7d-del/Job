@@ -1,6 +1,8 @@
 import { getAiConfig } from './config.js'
 
-const REQUEST_TIMEOUT_MS = 30000
+const REQUEST_TIMEOUT_MS = 90000
+const MAX_RETRIES = 2
+const RETRY_DELAY_MS = 1000
 
 const parsePrompt = `你是招聘信息结构化助手。请从截图中提取岗位信息，并只返回 JSON，不要返回额外说明。
 JSON schema:
@@ -25,12 +27,25 @@ export interface ScreenshotParseResult {
   benefits: string[]
 }
 
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
 function stripMarkdownCodeFence(text: string): string {
-  return text
-    .replace(/^```json\s*/i, '')
-    .replace(/^```\s*/i, '')
+  const trimmed = text.trim()
+  return trimmed
+    .replace(/^```(?:json)?\s*/i, '')
     .replace(/\s*```$/i, '')
     .trim()
+}
+
+function extractJsonObjectText(text: string): string {
+  const start = text.indexOf('{')
+  const end = text.lastIndexOf('}')
+  if (start === -1 || end === -1 || end <= start) {
+    return text
+  }
+  return text.slice(start, end + 1)
 }
 
 function normalizeParseResult(payload: Partial<ScreenshotParseResult>): ScreenshotParseResult {
@@ -84,22 +99,55 @@ export async function parseScreenshotWithProvider(imageDataUrl: string): Promise
   const model = aiConfig.model
   const apiUrl = aiConfig.apiUrl
   const apiKey = aiConfig.apiKey
-  const controller = new AbortController()
-  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
-  let response: Response
-  try {
-    response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify(buildProviderRequestBody(provider, model, imageDataUrl)),
-      signal: controller.signal,
-    })
-  } finally {
-    clearTimeout(timer)
+  const requestBody = JSON.stringify(buildProviderRequestBody(provider, model, imageDataUrl))
+
+  let response: Response | null = null
+  let lastError: unknown = null
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt += 1) {
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
+    try {
+      response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: requestBody,
+        signal: controller.signal,
+      })
+
+      if (response.ok) break
+
+      // Retry transient upstream failures.
+      if (response.status >= 500 && attempt < MAX_RETRIES) {
+        await sleep(RETRY_DELAY_MS * (attempt + 1))
+        continue
+      }
+      break
+    } catch (error) {
+      lastError = error
+      const isAbort = error instanceof DOMException && error.name === 'AbortError'
+      if (attempt < MAX_RETRIES) {
+        await sleep(RETRY_DELAY_MS * (attempt + 1))
+        continue
+      }
+      if (isAbort) {
+        throw new Error('AI 服务响应超时，请稍后重试。')
+      }
+      throw new Error('AI 服务暂时不可用，请稍后重试。')
+    } finally {
+      clearTimeout(timer)
+    }
   }
+
+  if (!response) {
+    if (lastError instanceof Error) {
+      throw lastError
+    }
+    throw new Error('AI 服务暂时不可用，请稍后重试。')
+  }
+
   if (!response.ok) {
     const text = await response.text()
     throw new Error(`AI parse failed (${response.status}): ${text || 'Unknown error'}`)
@@ -110,7 +158,13 @@ export async function parseScreenshotWithProvider(imageDataUrl: string): Promise
     throw new Error('AI returned empty content')
   }
   const normalizedText = stripMarkdownCodeFence(rawText)
-  const parsed = JSON.parse(normalizedText) as Partial<ScreenshotParseResult>
+  let parsed: Partial<ScreenshotParseResult>
+  try {
+    parsed = JSON.parse(normalizedText) as Partial<ScreenshotParseResult>
+  } catch {
+    const extracted = extractJsonObjectText(normalizedText)
+    parsed = JSON.parse(extracted) as Partial<ScreenshotParseResult>
+  }
   return normalizeParseResult(parsed)
 }
 
