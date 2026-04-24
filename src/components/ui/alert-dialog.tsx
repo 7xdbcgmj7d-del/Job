@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import * as AlertDialogPrimitive from '@radix-ui/react-alert-dialog'
 
@@ -10,21 +10,21 @@ export const AlertDialogTrigger = AlertDialogPrimitive.Trigger
 export const AlertDialogPortal = AlertDialogPrimitive.Portal
 
 export function AlertDialogOverlay(props: React.ComponentProps<typeof AlertDialogPrimitive.Overlay>) {
-  return <AlertDialogPrimitive.Overlay className={cn('fixed inset-0 z-50 bg-black/50', props.className)} {...props} />
+ return <AlertDialogPrimitive.Overlay className={cn('fixed inset-0 z-50 bg-black/50', props.className)} {...props} />
 }
 export function AlertDialogContent({
-  className,
-  ...props
+ className,
+ ...props
 }: React.ComponentProps<typeof AlertDialogPrimitive.Content>) {
-  return (
-    <AlertDialogPortal>
-      <AlertDialogOverlay />
-      <AlertDialogPrimitive.Content
-        className={cn('bg-background fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-lg border p-6 shadow-lg', className)}
-        {...props}
-      />
-    </AlertDialogPortal>
-  )
+ return (
+ <AlertDialogPortal>
+ <AlertDialogOverlay />
+ <AlertDialogPrimitive.Content
+ className={cn('bg-background fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-lg border p-6 shadow-lg', className)}
+ {...props}
+ />
+ </AlertDialogPortal>
+ )
 }
 export const AlertDialogHeader = (props: React.ComponentProps<'div'>) => <div className={cn('flex flex-col gap-2', props.className)} {...props} />
 export const AlertDialogFooter = (props: React.ComponentProps<'div'>) => <div className={cn('flex flex-col-reverse gap-2 sm:flex-row sm:justify-end', props.className)} {...props} />

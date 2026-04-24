@@ -1,9 +1,9 @@
-import { cn } from '@/components/ui/utils'
+﻿import { cn } from '@/components/ui/utils'
 
 export const Table = ({ className, ...props }: React.ComponentProps<'table'>) => (
-  <div className="relative w-full overflow-x-auto">
-    <table className={cn('w-full caption-bottom text-sm', className)} {...props} />
-  </div>
+ <div className="relative w-full overflow-x-auto">
+ <table className={cn('w-full caption-bottom text-sm', className)} {...props} />
+ </div>
 )
 export const TableHeader = (props: React.ComponentProps<'thead'>) => <thead className={cn('[&_tr]:border-b', props.className)} {...props} />
 export const TableBody = (props: React.ComponentProps<'tbody'>) => <tbody className={cn('[&_tr:last-child]:border-0', props.className)} {...props} />

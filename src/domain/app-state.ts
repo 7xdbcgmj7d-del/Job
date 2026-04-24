@@ -1,4 +1,4 @@
-import type { JobItem } from '@/modules/jobs/types'
+﻿import type { JobItem } from '@/modules/jobs/types'
 import type { InterviewTimelineRecord } from '@/modules/interviews/types'
 import type { ResumeVersion } from '@/modules/resumes/types'
 import type { AppSettings } from '@/modules/settings/types'
@@ -7,9 +7,9 @@ import type { AppSettings } from '@/modules/settings/types'
 export const APP_STATE_SCHEMA_VERSION = 1 as const
 
 export interface AppPersistedStateV1 {
-  schemaVersion: typeof APP_STATE_SCHEMA_VERSION
-  jobs: JobItem[]
-  interviews: InterviewTimelineRecord[]
-  resumes: ResumeVersion[]
-  settings: AppSettings
+ schemaVersion: typeof APP_STATE_SCHEMA_VERSION
+ jobs: JobItem[]
+ interviews: InterviewTimelineRecord[]
+ resumes: ResumeVersion[]
+ settings: AppSettings
 }
