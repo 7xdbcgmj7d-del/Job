@@ -12,7 +12,7 @@ export function useInterviewReminder(interviews: InterviewTimelineRecord[]) {
  if (typeof window === 'undefined' || !('Notification' in window)) return
 
  if (
- interviews.some((item) => item.status === '已安排') &&
+ interviews.some((item) => item.status === '已安排' || item.status === '待安排') &&
  window.Notification.permission === 'default'
  ) {
  void window.Notification.requestPermission()

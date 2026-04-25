@@ -1,5 +1,5 @@
 ﻿import { Plus } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import {
  AlertDialog,
@@ -24,13 +24,15 @@ import {
  JOB_STATUSES,
  JobsSidebar,
  type JobsAppSection,
+  IFRAME_LOAD_TIMEOUT_MS,
  StatisticsPanel,
+  SourcePreviewDrawer,
  StatsWidget,
  UserInfo,
  type JobItem,
  type JobStatus,
 } from './modules/jobs'
-import { InterviewTimeline, useInterviewReminder } from './modules/interviews'
+import { InterviewTimeline, useInterviewReminder, type InterviewTimelineRecord } from './modules/interviews'
 import { ResumeManager } from './modules/resumes'
 import { SettingsPanel } from './modules/settings/components'
 
@@ -40,6 +42,8 @@ interface InterviewFocusRequest {
  company?: string
  token: number
 }
+
+const AUTO_DRAFT_REMARK = '系统自动创建：岗位已进入待面试，请补充面试时间。'
 
 export default function App() {
  const { jobs, interviews, setJobs, setInterviews } = useAppState()
@@ -59,6 +63,10 @@ export default function App() {
  const [sortBy, setSortBy] = useState<SortKey>('appliedAt')
  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false)
  const [interviewFocusRequest, setInterviewFocusRequest] = useState<InterviewFocusRequest | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false)
+  const [previewLoadFailed, setPreviewLoadFailed] = useState(false)
+  const previewTimeoutRef = useRef<number | null>(null)
  useInterviewReminder(interviews)
 
  useEffect(() => {
@@ -70,6 +78,7 @@ export default function App() {
 
  const handleStatusChange = (jobId: number, status: string) => {
  if (!JOB_STATUSES.includes(status as JobStatus)) return
+let autoDraftJob: Pick<JobItem, 'id' | 'company' | 'position'> | null = null
 
  setJobs((currentJobs) =>
  currentJobs.map((job) => {
@@ -88,6 +97,9 @@ export default function App() {
  const history = [...(job.statusHistory ?? [])]
  if (job.status !== nextStatus) {
  history.push({ at: new Date().toISOString(), from: job.status, to: nextStatus })
+if (nextStatus === '待面试') {
+autoDraftJob = { id: job.id, company: job.company, position: job.position }
+}
  }
  return {
  ...job,
@@ -97,6 +109,32 @@ export default function App() {
  }
  })
  )
+
+if (autoDraftJob) {
+const targetJob = autoDraftJob
+setInterviews((prev) => {
+const hasPendingDraft = prev.some(
+ (item) => item.jobId === targetJob.id && item.status === '待安排'
+)
+if (hasPendingDraft) return prev
+const nextRecord: InterviewTimelineRecord = {
+ id:
+ typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+ ? crypto.randomUUID()
+ : `int-auto-${Date.now()}`,
+ jobId: targetJob.id,
+ company: targetJob.company,
+ jobTitle: targetJob.position,
+ roundType: 'HR初筛',
+ roundNumber: 1,
+ status: '待安排',
+ scheduledAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+ durationMinutes: 60,
+ remark: AUTO_DRAFT_REMARK,
+ }
+return [...prev, nextRecord]
+})
+}
  }
 
  const filters = useMemo(
@@ -161,7 +199,7 @@ export default function App() {
  handleStatusChange(jobId, '已投递')
  return
  }
- if (status === '面试中') {
+if (status === '待面试') {
  const job = jobs.find((item) => item.id === jobId)
  setInterviewFocusRequest({
  jobId,
@@ -171,7 +209,7 @@ export default function App() {
  setSection('interviews')
  return
  }
- if (status === '已投递' || status === '筛选中') {
+if (status === '已投递' || status === '筛选中') {
  openEditModal(jobId)
  return
  }
@@ -179,6 +217,48 @@ export default function App() {
  window.alert('建议尽快记录谈薪计划与入职时间。')
  }
  }
+
+const clearPreviewTimeout = () => {
+if (previewTimeoutRef.current !== null) {
+window.clearTimeout(previewTimeoutRef.current)
+previewTimeoutRef.current = null
+}
+}
+
+const startPreviewTimeout = () => {
+clearPreviewTimeout()
+previewTimeoutRef.current = window.setTimeout(() => {
+setPreviewLoadFailed(true)
+}, IFRAME_LOAD_TIMEOUT_MS)
+}
+
+const handleOpenSourcePreview = (url: string) => {
+setPreviewUrl(url)
+setPreviewLoadFailed(false)
+setIsPreviewOpen(true)
+startPreviewTimeout()
+}
+
+const handlePreviewOpenChange = (open: boolean) => {
+setIsPreviewOpen(open)
+if (!open) {
+clearPreviewTimeout()
+}
+}
+
+const handlePreviewIframeLoad = () => {
+clearPreviewTimeout()
+setPreviewLoadFailed(false)
+}
+
+const handlePreviewIframeFail = () => {
+clearPreviewTimeout()
+setPreviewLoadFailed(true)
+}
+
+useEffect(() => {
+return () => clearPreviewTimeout()
+}, [])
 
  const rightSidebarContent = (
  <>
@@ -369,6 +449,7 @@ export default function App() {
  onEdit={openEditModal}
  onDelete={(id) => setDeleteId(id)}
  onRecommendedAction={handleRecommendedAction}
+              onOpenSourcePreview={handleOpenSourcePreview}
  />
  ))}
  </div>
@@ -401,6 +482,14 @@ export default function App() {
  </div>
  ) : null}
  </div>
+      <SourcePreviewDrawer
+        open={isPreviewOpen}
+        previewUrl={previewUrl}
+        previewLoadFailed={previewLoadFailed}
+        onOpenChange={handlePreviewOpenChange}
+        onIframeLoad={handlePreviewIframeLoad}
+        onIframeFail={handlePreviewIframeFail}
+      />
  {section === 'jobs' ? (
  <div className="fixed bottom-8 left-24 z-40 xl:hidden">
  <Sheet open={mobilePanelOpen} onOpenChange={setMobilePanelOpen}>

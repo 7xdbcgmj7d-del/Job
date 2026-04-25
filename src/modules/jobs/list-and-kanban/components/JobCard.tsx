@@ -7,20 +7,20 @@ interface JobCardProps {
  salary: string
  status: string
  bgColor: string
- hasResume?: boolean
  sourceUrl?: string
  statusOptions?: string[]
  onStatusChange?: (jobId: number, status: string) => void
  onEdit?: (jobId: number) => void
  onDelete?: (jobId: number) => void
  onRecommendedAction?: (jobId: number, status: string) => void
+  onOpenSourcePreview?: (url: string) => void
 }
 
 const statusColors: Record<string, string> = {
  待投递: 'bg-gray-100 text-gray-700',
  已投递: 'bg-indigo-100 text-indigo-700',
  筛选中: 'bg-blue-100 text-blue-700',
- 面试中: 'bg-purple-100 text-purple-700',
+ 待面试: 'bg-purple-100 text-purple-700',
  Offer: 'bg-green-100 text-green-700',
  已淘汰: 'bg-red-100 text-red-700',
  已撤回: 'bg-zinc-100 text-zinc-700',
@@ -33,13 +33,13 @@ export function JobCard({
  salary,
  status,
  bgColor,
- hasResume,
  sourceUrl,
  statusOptions = [],
  onStatusChange,
  onEdit,
  onDelete,
  onRecommendedAction,
+  onOpenSourcePreview,
 }: JobCardProps) {
  const normalizedSourceUrl = sourceUrl?.trim()
  const hasValidSourceUrl = Boolean(normalizedSourceUrl && /^https?:\/\//i.test(normalizedSourceUrl))
@@ -47,7 +47,7 @@ export function JobCard({
  待投递: '去投递',
  已投递: '去跟进',
  筛选中: '催进度',
- 面试中: '记复盘',
+ 待面试: '去安排面试',
  Offer: '准备谈薪',
  }
  const recommendationLabel = recommendationByStatus[status]
@@ -92,13 +92,14 @@ export function JobCard({
  <DollarSign size={16} className="text-[#1a1a1a]" />
  <span className="text-sm font-semibold text-[#1a1a1a]">{salary}</span>
  </div>
- {hasResume || hasValidSourceUrl ? (
- hasValidSourceUrl ? (
+ {hasValidSourceUrl ? (
  <button
  type="button"
  onClick={(e) => {
  e.stopPropagation()
- window.open(normalizedSourceUrl, '_blank', 'noopener,noreferrer')
+                    if (normalizedSourceUrl) {
+                      onOpenSourcePreview?.(normalizedSourceUrl)
+                    }
  }}
  aria-label="打开岗位来源链接"
  title="打开岗位来源链接"
@@ -106,11 +107,6 @@ export function JobCard({
  >
  <Paperclip size={16} className="text-[#1a1a1a]" />
  </button>
- ) : (
- <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/60">
- <Paperclip size={16} className="text-[#1a1a1a]" />
- </div>
- )
  ) : null}
  </div>
  {recommendationLabel && onRecommendedAction && id !== undefined ? (

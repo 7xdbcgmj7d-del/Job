@@ -57,7 +57,7 @@ interface InterviewFormValues {
 }
 
 const ROUND_TYPES: InterviewTimelineRecord['roundType'][] = ['HR初筛', '技术面', '主管面', '总监面', 'HR终面', '群面', '案例面', '其他']
-const STATUS_OPTIONS: InterviewTimelineRecord['status'][] = ['已安排', '已完成', '已取消', '已改期']
+const STATUS_OPTIONS: InterviewTimelineRecord['status'][] = ['待安排', '已安排', '已完成', '已取消', '已改期']
 const HIGHLIGHT_DURATION_MS = 2400
 
 interface InterviewFocusRequest {
@@ -90,7 +90,7 @@ function toInterviewForm(record: InterviewTimelineRecord | null): InterviewFormV
  jobId: record ? String(record.jobId) : '',
  roundType: record?.roundType ?? 'HR初筛',
  roundNumber: record ? String(record.roundNumber) : '1',
- status: record?.status ?? '已安排',
+ status: record?.status ?? '待安排',
  scheduledAtLocal: toLocalInputValue(record?.scheduledAt),
  durationMinutes: record ? String(record.durationMinutes) : '60',
  location: record?.location ?? '',
@@ -102,6 +102,8 @@ function toInterviewForm(record: InterviewTimelineRecord | null): InterviewFormV
 
 function statusBadgeClass(status: InterviewTimelineRecord['status']) {
  switch (status) {
+ case '待安排':
+ return 'border-indigo-200 bg-indigo-50 text-indigo-800'
  case '已安排':
  return 'border-blue-200 bg-blue-50 text-blue-800'
  case '已完成':
@@ -140,7 +142,7 @@ export function InterviewTimeline({ focusRequest = null }: InterviewTimelineProp
  [settings.interviewQuestionBank]
  )
  const interviewingJobs = useMemo(
- () => jobs.filter((job) => job.status === '面试中'),
+ () => jobs.filter((job) => job.status === '待面试'),
  [jobs]
  )
 
@@ -214,7 +216,7 @@ export function InterviewTimeline({ focusRequest = null }: InterviewTimelineProp
  const saveInterviewRecord = () => {
  setFormError('')
  if (!editingRecord && interviewingJobs.length === 0) {
- setFormError('暂无“面试中”岗位，请先在岗位管理推进状态后再新增面试记录。')
+ setFormError('暂无“待面试”岗位，请先在岗位管理推进状态后再新增面试记录。')
  return
  }
  const jobId = Number.parseInt(formValues.jobId, 10)
@@ -224,9 +226,9 @@ export function InterviewTimeline({ focusRequest = null }: InterviewTimelineProp
  return
  }
  const canUseSelectedJob =
- linkedJob.status === '面试中' || (editingRecord ? linkedJob.id === editingRecord.jobId : false)
+ linkedJob.status === '待面试' || (editingRecord ? linkedJob.id === editingRecord.jobId : false)
  if (!canUseSelectedJob) {
- setFormError('仅可关联“面试中”的岗位。请先在岗位管理中更新岗位状态。')
+ setFormError('仅可关联“待面试”的岗位。请先在岗位管理中更新岗位状态。')
  return
  }
  const roundNumber = Number.parseInt(formValues.roundNumber, 10)
@@ -500,7 +502,7 @@ export function InterviewTimeline({ focusRequest = null }: InterviewTimelineProp
  <Label className="mb-1 block text-[#666666]">关联岗位 *</Label>
  {interviewingJobs.length === 0 ? (
  <p className="mb-2 text-xs text-amber-700">
- 暂无“面试中”岗位，请先在岗位管理推进状态后再新增面试记录。
+ 暂无“待面试”岗位，请先在岗位管理推进状态后再新增面试记录。
  </p>
  ) : null}
  <select
@@ -509,12 +511,12 @@ export function InterviewTimeline({ focusRequest = null }: InterviewTimelineProp
  className="w-full cursor-pointer rounded-xl border border-[#e8e6e2] bg-[#fbfaf8] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#1a1a1a]/10"
  >
  <option value="">
- {interviewingJobs.length === 0 ? '暂无面试中岗位' : '请选择岗位'}
+ {interviewingJobs.length === 0 ? '暂无待面试岗位' : '请选择岗位'}
  </option>
  {selectableJobs.map((job) => (
  <option key={job.id} value={job.id}>
  {job.company} · {job.position}
- {job.status !== '面试中' ? '（当前已关联，状态非面试中）' : ''}
+ {job.status !== '待面试' ? '（当前已关联，状态非待面试）' : ''}
  </option>
  ))}
  </select>

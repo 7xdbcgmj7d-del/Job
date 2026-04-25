@@ -10,7 +10,7 @@ export type InterviewRoundType =
  | '案例面'
  | '其他'
 
-export type InterviewScheduleStatus = '已安排' | '已完成' | '已取消' | '已改期'
+export type InterviewScheduleStatus = '待安排' | '已安排' | '已完成' | '已取消' | '已改期'
 
 /** PRD 3.5.4 复盘信息字段 */
 export interface InterviewDebrief {

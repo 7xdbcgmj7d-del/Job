@@ -1,4 +1,4 @@
-﻿export const JOB_STATUSES = ['待投递', '已投递', '筛选中', '面试中', 'Offer', '已淘汰', '已撤回'] as const
+﻿export const JOB_STATUSES = ['待投递', '已投递', '筛选中', '待面试', 'Offer', '已淘汰', '已撤回'] as const
 
 export type JobStatus = (typeof JOB_STATUSES)[number]
 

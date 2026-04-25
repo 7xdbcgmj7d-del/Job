@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Label } from '@/components/ui/label'
 import { parseJobScreenshotWithAI, ScreenshotUploader } from '@/modules/screenshot'
 import { useAppState } from '@/state/AppStateContext'
+import type { InterviewTimelineRecord } from '@/modules/interviews'
 
 import { getAllowedStatusOptions, isStatusTransitionAllowed } from '../../domain/job-status-rules'
 import type { JobItem, JobStatus, WorkMode, WorkType } from '../../types'
@@ -19,7 +20,7 @@ const WORK_TYPES: WorkType[] = ['全职', '实习', '兼职', '合同工']
 const WORK_MODES: WorkMode[] = ['现场', '远程', '混合']
 
 export function AddJobModal({ isOpen, draftJob, onClose }: AddJobModalProps) {
- const { jobs, resumes, setJobs } = useAppState()
+ const { jobs, resumes, setJobs, setInterviews } = useAppState()
  const [formValues, setFormValues] = useState<JobFormValues>(emptyJobForm)
  const [quickMode, setQuickMode] = useState(true)
  const [imageDataUrl, setImageDataUrl] = useState('')
@@ -120,10 +121,38 @@ export function AddJobModal({ isOpen, draftJob, onClose }: AddJobModalProps) {
  bgColorForNew: pickJobBgColor(nextIdGuess),
  })
 
+ const shouldAutoCreateInterviewDraft = (draftJob?.status ?? '待投递') !== '待面试' && built.status === '待面试'
+
  if (draftJob) {
  setJobs((prev) => prev.map((j) => (j.id === built.id ? built : j)))
  } else {
  setJobs((prev) => [...prev, { ...built, id: nextIdGuess }])
+ }
+
+ if (shouldAutoCreateInterviewDraft) {
+ const targetJobId = draftJob?.id ?? nextIdGuess
+ setInterviews((prev) => {
+ const hasPendingDraft = prev.some(
+ (item) => item.jobId === targetJobId && item.status === '待安排'
+ )
+ if (hasPendingDraft) return prev
+ const nextRecord: InterviewTimelineRecord = {
+ id:
+ typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+ ? crypto.randomUUID()
+ : `int-auto-${Date.now()}`,
+ jobId: targetJobId,
+ company: built.company,
+ jobTitle: built.position,
+ roundType: 'HR初筛',
+ roundNumber: 1,
+ status: '待安排',
+ scheduledAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+ durationMinutes: 60,
+ remark: '系统自动创建：岗位已进入待面试，请补充面试时间。',
+ }
+ return [...prev, nextRecord]
+ })
  }
  onClose()
  }

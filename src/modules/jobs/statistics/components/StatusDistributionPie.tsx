@@ -7,7 +7,7 @@ const STATUS_COLORS: Record<(typeof JOB_STATUSES)[number], string> = {
  待投递: '#d4d4d8',
  已投递: '#93c5fd',
  筛选中: '#a7f3d0',
- 面试中: '#fcd34d',
+ 待面试: '#fcd34d',
  Offer: '#86efac',
  已淘汰: '#fca5a5',
  已撤回: '#c4b5fd',

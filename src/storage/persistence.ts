@@ -12,7 +12,8 @@ export const APP_STATE_STORAGE_KEY = 'job-tracker-app-state-v1'
 
 /** 迁移前简历独立存储 key（合并进 app state 后由 save 清理） */
 const LEGACY_RESUME_STORAGE_KEY = 'job-tracker-resumes-v1'
-const INTERVIEW_STATUSES = ['已安排', '已完成', '已取消', '已改期'] as const
+const LEGACY_INTERVIEWING_STATUS = '面试中'
+const INTERVIEW_STATUSES = ['待安排', '已安排', '已完成', '已取消', '已改期'] as const
 const INTERVIEW_ROUND_TYPES = ['HR初筛', '技术面', '主管面', '总监面', 'HR终面', '群面', '案例面', '其他'] as const
 
 function tryParseJson(raw: string): unknown {
@@ -37,14 +38,37 @@ function loadLegacyResumes(): ResumeVersion[] {
 
 function sanitizeJobItem(raw: unknown, fallback: JobItem, index: number): JobItem {
  const obj = raw && typeof raw === 'object' ? (raw as Partial<JobItem>) : {}
- const safeStatus = JOB_STATUSES.includes(obj.status as JobStatus)
- ? (obj.status as JobStatus)
+ const normalizedStatusCandidate =
+ obj.status === LEGACY_INTERVIEWING_STATUS ? '待面试' : obj.status
+ const safeStatus = JOB_STATUSES.includes(normalizedStatusCandidate as JobStatus)
+ ? (normalizedStatusCandidate as JobStatus)
  : fallback.status
  const idValue = typeof obj.id === 'number' && Number.isFinite(obj.id) ? Math.trunc(obj.id) : fallback.id + index
  const company = String(obj.company ?? '').trim() || fallback.company
  const position = String(obj.position ?? '').trim() || fallback.position
  const salary = String(obj.salary ?? '').trim() || fallback.salary
  const bgColor = String(obj.bgColor ?? '').trim() || fallback.bgColor
+ const rawStatusHistory = Array.isArray(obj.statusHistory) ? obj.statusHistory : []
+ const statusHistory = rawStatusHistory
+ .map((entry) => {
+ const e = entry as Partial<{ at: string; from: JobStatus | string; to: JobStatus | string }>
+ const normalizedFrom = e.from === LEGACY_INTERVIEWING_STATUS ? '待面试' : e.from
+ const normalizedTo = e.to === LEGACY_INTERVIEWING_STATUS ? '待面试' : e.to
+ if (
+ typeof e.at !== 'string' ||
+ !JOB_STATUSES.includes(normalizedFrom as JobStatus) ||
+ !JOB_STATUSES.includes(normalizedTo as JobStatus)
+ ) {
+ return null
+ }
+ return {
+ at: e.at,
+ from: normalizedFrom as JobStatus,
+ to: normalizedTo as JobStatus,
+ }
+ })
+ .filter((entry): entry is NonNullable<typeof entry> => Boolean(entry))
+
  return {
  ...fallback,
  ...obj,
@@ -54,6 +78,7 @@ function sanitizeJobItem(raw: unknown, fallback: JobItem, index: number): JobIte
  salary,
  bgColor,
  status: safeStatus,
+ statusHistory: statusHistory.length > 0 ? statusHistory : undefined,
  }
 }
 

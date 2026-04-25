@@ -10,9 +10,17 @@ interface KanbanBoardProps {
  onStatusChange: (jobId: number, status: string) => void
  onEditJob?: (jobId: number) => void
  onDeleteJob?: (jobId: number) => void
+  onOpenSourcePreview?: (url: string) => void
 }
 
-export function KanbanBoard({ jobs, statuses, onStatusChange, onEditJob, onDeleteJob }: KanbanBoardProps) {
+export function KanbanBoard({
+  jobs,
+  statuses,
+  onStatusChange,
+  onEditJob,
+  onDeleteJob,
+  onOpenSourcePreview,
+}: KanbanBoardProps) {
  const [dragOverStatus, setDragOverStatus] = useState<string | null>(null)
 
  return (
@@ -67,6 +75,7 @@ export function KanbanBoard({ jobs, statuses, onStatusChange, onEditJob, onDelet
  onStatusChange={onStatusChange}
  onEdit={onEditJob}
  onDelete={onDeleteJob}
+                    onOpenSourcePreview={onOpenSourcePreview}
  />
  </div>
  ))

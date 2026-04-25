@@ -25,7 +25,7 @@ function StatItem({ label, value, color }: StatItemProps) {
 export function StatsWidget({ jobs }: { jobs: JobItem[] }) {
  const { total, interviewing, offers, conversion } = useMemo(() => {
  const total = jobs.length
- const interviewing = jobs.filter((j) => j.status === '面试中').length
+ const interviewing = jobs.filter((j) => j.status === '待面试').length
  const offers = jobs.filter((j) => j.status === 'Offer').length
  const conversion = total > 0 ? Math.round((offers / total) * 100) : 0
  return { total, interviewing, offers, conversion }
@@ -34,7 +34,7 @@ export function StatsWidget({ jobs }: { jobs: JobItem[] }) {
  return (
  <div className="grid grid-cols-2 gap-4 rounded-[20px] bg-white p-5 sm:grid-cols-4">
  <StatItem label="总投递" value={total} />
- <StatItem label="面试中" value={interviewing} />
+ <StatItem label="待面试" value={interviewing} />
  <StatItem label="Offer" value={offers} color="#4CAF50" />
  <StatItem label="转化率" value={`${conversion}%`} />
  </div>
