@@ -38,8 +38,11 @@ function loadLegacyResumes(): ResumeVersion[] {
 
 function sanitizeJobItem(raw: unknown, fallback: JobItem, index: number): JobItem {
  const obj = raw && typeof raw === 'object' ? (raw as Partial<JobItem>) : {}
+ const rawStatusValue =
+ raw && typeof raw === 'object' ? (raw as Record<string, unknown>).status : undefined
+ const rawStatus = typeof rawStatusValue === 'string' ? rawStatusValue : undefined
  const normalizedStatusCandidate =
- obj.status === LEGACY_INTERVIEWING_STATUS ? '待面试' : obj.status
+ rawStatus === LEGACY_INTERVIEWING_STATUS ? '待面试' : rawStatus
  const safeStatus = JOB_STATUSES.includes(normalizedStatusCandidate as JobStatus)
  ? (normalizedStatusCandidate as JobStatus)
  : fallback.status

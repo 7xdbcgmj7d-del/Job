@@ -78,12 +78,14 @@ export default function App() {
 
  const handleStatusChange = (jobId: number, status: string) => {
  if (!JOB_STATUSES.includes(status as JobStatus)) return
-let autoDraftJob: Pick<JobItem, 'id' | 'company' | 'position'> | null = null
+const currentJob = jobs.find((job) => job.id === jobId)
+if (!currentJob) return
+const nextStatus = status as JobStatus
+const shouldCreateAutoDraft = currentJob.status !== '待面试' && nextStatus === '待面试'
 
  setJobs((currentJobs) =>
  currentJobs.map((job) => {
  if (job.id !== jobId) return job
- const nextStatus = status as JobStatus
  if (!isStatusTransitionAllowed(job.status, nextStatus)) {
  window.alert(`无法从「${job.status}」直接变更为「${nextStatus}」，请按流程调整。`)
  return job
@@ -97,9 +99,6 @@ let autoDraftJob: Pick<JobItem, 'id' | 'company' | 'position'> | null = null
  const history = [...(job.statusHistory ?? [])]
  if (job.status !== nextStatus) {
  history.push({ at: new Date().toISOString(), from: job.status, to: nextStatus })
-if (nextStatus === '待面试') {
-autoDraftJob = { id: job.id, company: job.company, position: job.position }
-}
  }
  return {
  ...job,
@@ -110,11 +109,10 @@ autoDraftJob = { id: job.id, company: job.company, position: job.position }
  })
  )
 
-if (autoDraftJob) {
-const targetJob = autoDraftJob
+if (shouldCreateAutoDraft) {
 setInterviews((prev) => {
 const hasPendingDraft = prev.some(
- (item) => item.jobId === targetJob.id && item.status === '待安排'
+ (item) => item.jobId === currentJob.id && item.status === '待安排'
 )
 if (hasPendingDraft) return prev
 const nextRecord: InterviewTimelineRecord = {
@@ -122,9 +120,9 @@ const nextRecord: InterviewTimelineRecord = {
  typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
  ? crypto.randomUUID()
  : `int-auto-${Date.now()}`,
- jobId: targetJob.id,
- company: targetJob.company,
- jobTitle: targetJob.position,
+ jobId: currentJob.id,
+ company: currentJob.company,
+ jobTitle: currentJob.position,
  roundType: 'HR初筛',
  roundNumber: 1,
  status: '待安排',
